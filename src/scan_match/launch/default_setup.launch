@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+
+<!-- 
+     # Mon Apr 11 21:34:12 EEST 2016, nickkouk
+     Main launch file used during testing.
+
+-->
+
+<launch>
+    <!-- LAUNCH ARGUEMENTS -->
+    <arg name="rosbag2play" default="wg-cafe"/>
+    <arg name="scan_topic" default="/scan"/>
+    <arg name="bag_simulation" default="true"/>
+
+    <!-- LAUNCH PARAMETERS -->
+    <param name="/use_sim_time" value="true"/>
+    <param name="/base_scan" value="$(arg scan_topic)"/>
+
+    <group if="$(arg bag_simulation)" >
+        <node pkg="rosbag" type="play" name="player" 
+        args="--clock $(find scan_match)/rosbags/$(arg rosbag2play).bag /base_scan:=$(arg scan_topic)" />
+    </group>
+
+
+    <!-- NODES TO LAUNCH -->
+    <node name="laser_parser" pkg="scan_match" type="laser_parser" output="screen"/>
+    <node name="scan_match" pkg="scan_match" type="scan_match" output="screen"/>
+
+</launch>

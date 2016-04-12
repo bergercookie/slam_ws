@@ -1,0 +1,5 @@
+build/
+devel/
+rosbags/
+*.swo
+.DS_Store
