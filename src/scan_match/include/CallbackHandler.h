@@ -8,12 +8,12 @@
 
 // ROS
 #include <ros/ros.h>
-#include <geometry_msgs/Pose2D.h>
-#include <sensor_msgs/LaserScan.h>
 #include <ros/console.h>
 #include <std_msgs/String.h>
-#include <scan_match/GraphProperties.h>
+#include <geometry_msgs/Pose2D.h>
+#include <sensor_msgs/LaserScan.h>
 
+#include <scan_match/GraphProperties.h>
 
 // iSAM
 #include <isam/isam.h>
@@ -34,21 +34,13 @@ using namespace Eigen;
 class CallbackHandler 
 {
   public:
-    CallbackHandler
-      (
-        Slam *slam_ptr_in
-      , std::vector<Node*> *node_list_in
-      , std::vector<sensor_msgs::LaserScan*> *laser_scans_in
-      , std::vector<geometry_msgs::Pose2D*> *g_pose2d_list_in
-      , std::vector<ros::Time*> *timestamps_list_in
-      );
-
+    CallbackHandler(void);
     virtual ~CallbackHandler();
 
     void checkOdometricConstraint(const geometry_msgs::Pose2DConstPtr& pose_in);
     void getCurLaserScan(const sensor_msgs::LaserScanPtr& laser_in);
     void postGraphProperties(ros::Publisher &graph_props_pub, const int robot_id) const;
-    void postString(ros::Publisher &std_pub); // TODO - remove this
+    void initGraph(void);
 
     Slam *slam_ptr;
 
@@ -66,7 +58,6 @@ class CallbackHandler
 
     double distance_;
     double twist_;
-    double diff_x_, diff_y_, diff_th_;
 
     bool initialised_laser_scans_; // boolean to know if the laser_scans vector contains at least one element
     

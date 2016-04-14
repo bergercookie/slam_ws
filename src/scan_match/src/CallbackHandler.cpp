@@ -18,30 +18,28 @@ using namespace Eigen;
  * CONSTRUCTORS & DESTRUCTORS
  *****************************/
 
-CallbackHandler::CallbackHandler(
-    Slam *slam_ptr_in, 
-    std::vector<Node*> *node_list_in, 
-    std::vector<sensor_msgs::LaserScan*> *laser_scans_in, // TODO change the in names to be consistent
-    std::vector<geometry_msgs::Pose2D*> *g_pose2d_list_in,
-    std::vector<ros::Time*> *timestamps_list_in/*, sensor_msgs::LaserScan cur_laser_s */):
-
-slam_ptr(slam_ptr_in),
-node_list(node_list_in),
-laser_scans(laser_scans_in),
-g_pose2d_list(g_pose2d_list_in),
-timestamps_list(timestamps_list_in),
-
+CallbackHandler::CallbackHandler():
 noise_(Information(100. * eye(3))), // TODO change its position...
 time_thresh_(ros::Duration(slam_params::kOdometryTimeThresh))
 { 
-  //ROS_INFO("In the CalbackHander Constructor");
+  ROS_INFO("In the CalbackHander Constructor"); // TODO - add condition for printing the "In" messages
+  
+  // Initialize the objects on the heap
+  slam_ptr = new Slam;
+  node_list = new std::vector<Node*>;
+  laser_scans = new std::vector<sensor_msgs::LaserScan*>;
+  g_pose2d_list = new std::vector<geometry_msgs::Pose2D*>;
+  timestamps_list = new std::vector<ros::Time*>;
 
   initialised_laser_scans_ = false;
+
+  // put the first nodes in the graph
+  initGraph();
 }
 
 CallbackHandler::~CallbackHandler()
 { 
-  //ROS_INFO("In the CalbackHander Destructor");
+  ROS_INFO("In the CalbackHander Destructor");
   // TODO - delete all the dynamically allocated objects / std::vector<..*>
 }
 
@@ -59,11 +57,12 @@ CallbackHandler::~CallbackHandler()
  */
 void CallbackHandler::checkOdometricConstraint(const geometry_msgs::Pose2DConstPtr& pose_in)
 {
+  ROS_INFO("In the checkOdometricConstraint fun..");
   // TODO - Add docstring here..
   if (!initialised_laser_scans_)
   {
 
-    ROS_INFO("CallbackHandler::checkOdometricConstraint: initialising laser_scans_..");
+    ROS_INFO("checkOdometricConstraint: initialising laser_scans_..");
     sensor_msgs::LaserScan* current_scan_ptr_ = new sensor_msgs::LaserScan;
     *current_scan_ptr_ = current_scan_;
     laser_scans->push_back(current_scan_ptr_);
@@ -73,6 +72,7 @@ void CallbackHandler::checkOdometricConstraint(const geometry_msgs::Pose2DConstP
 
   else 
   {
+    ROS_INFO("checkOdometricConstraint: Checking Constraints..");
     // TODO Check this part again..  seems like it adds nodes for no reason at
     // some point
     
@@ -102,7 +102,6 @@ void CallbackHandler::checkOdometricConstraint(const geometry_msgs::Pose2DConstP
 
     time_diff_ = *cur_timestamp_ - *last_timestamp_;
     ROS_INFO_STREAM("Time difference: " << time_diff_);
-
 
 
     /** 
@@ -182,7 +181,7 @@ void CallbackHandler::checkOdometricConstraint(const geometry_msgs::Pose2DConstP
  */
 void CallbackHandler::getCurLaserScan(const sensor_msgs::LaserScanPtr& laser_in)
 {
-  //ROS_INFO("In the getCurLaserScan fun");
+  //ROS_INFO("In the getCurLaserScan fun..");
   
   // The goal is to keep the contents of the laser scan after the end of the
   // function, so DO NOT use a pointer as it will be a dangling pointer once
@@ -201,7 +200,7 @@ void CallbackHandler::getCurLaserScan(const sensor_msgs::LaserScanPtr& laser_in)
  */
 void CallbackHandler::postGraphProperties(ros::Publisher &graph_props_pub, const int robot_id) const
 {
-  ROS_INFO("In the postGrphProperties fun");
+  ROS_INFO("In the postGraphProperties fun");
 
   scan_match::GraphProperties graph_props;
   graph_props.robot_id = robot_id;
@@ -231,12 +230,36 @@ void CallbackHandler::postGraphProperties(ros::Publisher &graph_props_pub, const
 
 }
 
-// TODO - remove this
-void CallbackHandler::postString(ros::Publisher &std_pub)
-{
-  std_msgs::String a_string;
-  a_string.data = "kalimera";
+/**
+ * CallbackHandler::initGraph
+ *
+ * initGraph initializes the empty Slam object and the corresponding
+ * nodes/time vectors
+ */
+void CallbackHandler::initGraph(void) {
+  ROS_INFO("Inside the initGraph fun..");
+  // start working with nodes and factors here
+  Pose2d prior_origin(0., 0., 0.);
 
-  std_pub.publish(a_string);
+  // pose nodes and constraints
+  Pose2d_Node *a0 = new Pose2d_Node();
+  slam_ptr->add_node(a0);
+  node_list->push_back(a0);
+
+  ros::Time *stamp_start = new ros::Time();
+  *stamp_start = ros::Time::now();
+  //ROS_INFO_STREAM("initGraph: current time: " << *stamp_start);
+  timestamps_list->push_back(stamp_start);
+
+  // TODO - Putting noise in the slam_params namespace raises a linker error
+  Pose2d_Factor *p_a0 = new Pose2d_Factor(a0, prior_origin, noise_);
+  slam_ptr->add_factor(p_a0);
   
+  // add the current g_pose to the g_pose2d_list
+  geometry_msgs::Pose2D *g_pose2d_ptr = new geometry_msgs::Pose2D;
+  g_pose2d_ptr->x = 0.; g_pose2d_ptr->y = 0.; g_pose2d_ptr->theta = 0.;
+  g_pose2d_list->push_back(g_pose2d_ptr);
+
+  ROS_INFO_STREAM("initGraph: Added g_pose = " << *g_pose2d_list->back());
+
 }
