@@ -9,8 +9,10 @@
 // ROS
 #include <ros/ros.h>
 #include <geometry_msgs/Pose2D.h>
+#include <sensor_msgs/LaserScan.h>
 #include <ros/console.h>
 #include <std_msgs/String.h>
+#include <scan_match/GraphProperties.h>
 
 
 // iSAM
@@ -32,22 +34,34 @@ using namespace Eigen;
 class CallbackHandler 
 {
   public:
-    CallbackHandler(Slam *slamPtr, 
-      std::vector<Node*> *node_l, \
-      std::vector<ros::Time*> *timestamps_l);
+    CallbackHandler
+      (
+        Slam *slamPtr
+      , std::vector<Node*> *node_l
+      , std::vector<sensor_msgs::LaserScan*> *laser_scans
+      , std::vector<geometry_msgs::Pose2D*> *g_pose2d_l
+      , std::vector<ros::Time*> *timestamps_l 
+      );
+
     virtual ~CallbackHandler();
 
     void checkOdometricConstraint(const geometry_msgs::Pose2DConstPtr& pose_in);
+    void getCurLaserScan(const sensor_msgs::LaserScanPtr& laser_in);
+    void postGraphProperties(ros::Publisher &graph_props_pub, const int robot_id) const;
+    void postString(ros::Publisher &std_pub); // TODO - remove this
 
     Slam *slam_ptr;
 
     std::vector<Node*> *node_list;
+    std::vector<sensor_msgs::LaserScan*> *laser_scans;
+    std::vector<geometry_msgs::Pose2D*> *g_pose2d_list;
     std::vector<ros::Time*> *timestamps_list;
 
   private:
 
     Noise noise_;
 
+    sensor_msgs::LaserScan current_scan_;
     double distance_;
     double twist_;
 
@@ -55,6 +69,8 @@ class CallbackHandler
 
     ros::Duration time_thresh_; // maximum time duration between successive nodes
     ros::Duration time_diff_; // maximum time duration between successive nodes
+
+    bool initialised_laser_scans_; // boolean to know if the laser_scans vector contains at least one element
 
     
 };

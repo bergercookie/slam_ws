@@ -10,6 +10,7 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   geometry_msgs
+  sensor_msgs
 )
 
 
@@ -50,7 +51,7 @@ find_package(catkin REQUIRED COMPONENTS
  add_message_files(
    FILES
    Person.msg
-   #Message1.msg
+   GraphProperties.msg
    #Message2.msg
  )
 
@@ -72,6 +73,8 @@ find_package(catkin REQUIRED COMPONENTS
  generate_messages(
    DEPENDENCIES
    std_msgs
+   geometry_msgs
+   sensor_msgs
  )
 
 ################################################
@@ -104,9 +107,9 @@ find_package(catkin REQUIRED COMPONENTS
 ## CATKIN_DEPENDS: catkin_packages dependent projects also need
 ## DEPENDS: system dependencies of this project that dependent projects also need
 catkin_package(
-  #INCLUDE_DIRS include
+  INCLUDE_DIRS include
   LIBRARIES scan_match
-  CATKIN_DEPENDS laser_scan_matcher roscpp rospy std_msgs geometry_msgs
+  CATKIN_DEPENDS laser_scan_matcher roscpp rospy std_msgs geometry_msgs sensor_msgs
   DEPENDS system_lib
 )
 

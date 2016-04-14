@@ -3,3 +3,4 @@ devel/
 rosbags/
 *.swo
 .DS_Store
+*saved_session*
