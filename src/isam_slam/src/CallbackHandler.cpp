@@ -6,11 +6,6 @@ using namespace isam;
 using namespace Eigen;
 
 /**
- * class containing trivial mathematical utilities
- */
-
-
-/**
  * CallbachHandler Class Implementations
  */
 
@@ -26,7 +21,7 @@ time_thresh_(ros::Duration(slam_params::kOdometryTimeThresh))
   
   // Initialize the objects on the heap
   slam_ptr = new Slam;
-  node_list = new std::vector<Node*>;
+  node_list = new std::vector<isam::Node*>;
   laser_scans = new std::vector<sensor_msgs::LaserScan*>;
   g_pose2d_list = new std::vector<geometry_msgs::Pose2D*>;
   timestamps_list = new std::vector<ros::Time*>;
@@ -87,7 +82,7 @@ void CallbackHandler::checkOdometricConstraint(const geometry_msgs::Pose2DConstP
     * Get distance, twist and time difference from the last inserted node.
     */
 
-    Node *last_node = node_list->back();
+    isam::Node *last_node = node_list->back();
     ros::Time *last_timestamp_ = timestamps_list->back();
 
     ROS_INFO("last node: (%.2f, %.2f, %.2f)", 
@@ -120,22 +115,26 @@ void CallbackHandler::checkOdometricConstraint(const geometry_msgs::Pose2DConstP
       * Add the slam graph node and the corresponding factor 
       */
 
-      Pose2d *temp_pose = new Pose2d(pose_in->x, pose_in->y, pose_in->theta);
+      isam::Pose2d *temp_pose = new Pose2d(pose_in->x, pose_in->y, pose_in->theta);
 
-      Pose2d_Node *last_node_casted = dynamic_cast<Pose2d_Node*>(last_node);
-      Pose2d last_node_pose2d = last_node_casted->value();
-      Pose2d laser_odom = temp_pose->ominus(last_node_pose2d);
+      isam::Pose2d_Node *last_node_casted = dynamic_cast<isam::Pose2d_Node*>(last_node);
+      isam::Pose2d last_node_pose2d = last_node_casted->value();
+      isam::Pose2d laser_odom = temp_pose->ominus(last_node_pose2d);
       ROS_INFO_STREAM("Constraint to add: " << laser_odom);
 
       /** 
       * Put everything to slam_ptr
       */
-      Pose2d_Node *next_node = new Pose2d_Node();
+      isam::Pose2d_Node *next_node = new isam::Pose2d_Node();
       node_list->push_back(next_node);
       slam_ptr->add_node(next_node);
 
-      Pose2d_Pose2d_Factor *constraint = new Pose2d_Pose2d_Factor(last_node_casted, 
-          next_node, laser_odom, noise_);
+      isam::Pose2d_Pose2d_Factor *constraint = 
+        new isam::Pose2d_Pose2d_Factor(
+            last_node_casted
+            , next_node
+            , laser_odom
+            , noise_);
       // TODO - consider initializing every pointer only once in the header file
       slam_ptr->add_factor(constraint);
       
@@ -198,11 +197,11 @@ void CallbackHandler::getCurLaserScan(const sensor_msgs::LaserScanPtr& laser_in)
  * the ros::Publisher and a robot id is given
  *
  */
-void CallbackHandler::postGraphProperties(ros::Publisher &graph_props_pub, const int robot_id) const
+void CallbackHandler::postGraphProperties(const ros::Publisher &graph_props_pub, const int robot_id) const
 {
   ROS_INFO("In the postGraphProperties fun");
 
-  scan_match::GraphProperties graph_props;
+  isam_slam::GraphProperties graph_props;
   graph_props.robot_id = robot_id;
 
   //graph_props.node_list = *g_pose2d_list;
@@ -239,10 +238,10 @@ void CallbackHandler::postGraphProperties(ros::Publisher &graph_props_pub, const
 void CallbackHandler::initGraph(void) {
   ROS_INFO("Inside the initGraph fun..");
   // start working with nodes and factors here
-  Pose2d prior_origin(0., 0., 0.);
+  isam::Pose2d prior_origin(0., 0., 0.);
 
   // pose nodes and constraints
-  Pose2d_Node *a0 = new Pose2d_Node();
+  isam::Pose2d_Node *a0 = new isam::Pose2d_Node();
   slam_ptr->add_node(a0);
   node_list->push_back(a0);
 
@@ -252,7 +251,7 @@ void CallbackHandler::initGraph(void) {
   timestamps_list->push_back(stamp_start);
 
   // TODO - Putting noise in the slam_params namespace raises a linker error
-  Pose2d_Factor *p_a0 = new Pose2d_Factor(a0, prior_origin, noise_);
+  isam::Pose2d_Factor *p_a0 = new isam::Pose2d_Factor(a0, prior_origin, noise_);
   slam_ptr->add_factor(p_a0);
   
   // add the current g_pose to the g_pose2d_list
@@ -260,6 +259,7 @@ void CallbackHandler::initGraph(void) {
   g_pose2d_ptr->x = 0.; g_pose2d_ptr->y = 0.; g_pose2d_ptr->theta = 0.;
   g_pose2d_list->push_back(g_pose2d_ptr);
 
-  ROS_INFO_STREAM("initGraph: Added g_pose = " << *g_pose2d_list->back());
+  ROS_INFO("initGraph: Added g_pose = " );
+  ROS_INFO_STREAM(*g_pose2d_list->back());
 
 }

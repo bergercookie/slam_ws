@@ -18,12 +18,12 @@
 
     <group if="$(arg bag_simulation)" >
         <node pkg="rosbag" type="play" name="rosbag_player" 
-        args="--clock $(find scan_match)/rosbags/$(arg rosbag2play).bag /base_scan:=$(arg scan_topic)" />
+        args="--clock $(find isam_slam)/rosbags/$(arg rosbag2play).bag /base_scan:=$(arg scan_topic)" />
     </group>
 
 
     <!-- NODES TO LAUNCH -->
-    <node name="laser_parser" pkg="scan_match" type="laser_parser" output="screen"/>
-    <node name="isam_node" pkg="scan_match" type="scan_match" output="screen"/>
+    <node name="laser_parser" pkg="isam_slam" type="laser_parser" output="screen"/>
+    <node name="isam_node" pkg="isam_slam" type="isam_slam" output="screen"/>
 
 </launch>

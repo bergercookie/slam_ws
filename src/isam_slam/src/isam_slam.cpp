@@ -2,78 +2,29 @@
 #include <vector>
 #include <cmath>
 
+// ROS
 #include <ros/ros.h>
 #include <ros/console.h>
 #include <ros/time.h>
 #include <std_msgs/String.h>
 #include <geometry_msgs/Pose2D.h>
 #include <sensor_msgs/LaserScan.h>
-#include <scan_match/GraphProperties.h>
 
+
+// iSAM
 #include <isam/isam.h>
 #include <Eigen/LU>
 
+// PROJECT
+#include <isam_slam/GraphProperties.h>
 #include "CallbackHandler.h"
 #include "slam_params.h"
-
-// using
-using namespace isam;
-using namespace Eigen;
-
-
-Noise noise = SqrtInformation(10. * eye(3));
-
-/** 
- * Supplementary Functions
- *
- */
-
-/**
- * init_graph initializes the empty Slam object and the corresponding
- * nodes/time vectors
- */
-//void init_graph
-  //(
-  //Slam *slam
-  //, std::vector<Node*> *node_list
-  //, std::vector<ros::Time*> *node_stamps
-  //, std::vector<geometry_msgs::Pose2D*> *g_pose2d_list
-  //)
-//{
-  ////ROS_INFO("In init_graph fun");
-  
-  //// start working with nodes and factors here
-  //Pose2d prior_origin(0., 0., 0.);
-
-  //// pose nodes and constraints
-  //Pose2d_Node *a0 = new Pose2d_Node();
-  //slam->add_node(a0);
-  //node_list->push_back(a0);
-
-  //ros::Time *stamp_start = new ros::Time();
-  //*stamp_start = ros::Time::now();
-  ////ROS_INFO_STREAM("init_graph: current time: " << *stamp_start);
-  //node_stamps->push_back(stamp_start);
-
-  //// TODO - Putting noise in the slam_params namespace raises a linker error
-  //Pose2d_Factor *p_a0 = new Pose2d_Factor(a0, prior_origin, noise);
-  //slam->add_factor(p_a0);
-  
-  //// add the current g_pose to the g_pose2d_list
-  //geometry_msgs::Pose2D *g_pose2d_ptr = new geometry_msgs::Pose2D;
-  //g_pose2d_ptr->x = 0.; g_pose2d_ptr->y = 0.; g_pose2d_ptr->theta = 0.;
-  //g_pose2d_list->push_back(g_pose2d_ptr);
-
-  //ROS_INFO_STREAM("init_graph: Added g_pose = " << *g_pose2d_list->back());
-
-
-//}
 
 
 /**
  * MAIN
+ * TODO - Include descriptive docstring
  */
-
 int main(int argc, char **argv)
 {
   /**
@@ -110,7 +61,7 @@ int main(int argc, char **argv)
   ROS_INFO("Laser Subscriber initialised.");
 
 
-  ros::Publisher graph_props_pub = nh.advertise<scan_match::GraphProperties>(
+  ros::Publisher graph_props_pub = nh.advertise<isam_slam::GraphProperties>(
       "graph_properties", 100, /* latch= */ true);
 
   /** 

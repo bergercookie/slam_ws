@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package>
-  <name>scan_match</name>
+  <name>isam_slam</name>
   <version>0.0.0</version>
-  <description>The scan_match package</description>
+  <description>The isam_slam package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag --> 
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but mutiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/scan_match</url> -->
+  <!-- <url type="website">http://wiki.ros.org/isam_slam</url> -->
 
 
   <!-- Author tags are optional, mutiple are allowed, one per tag -->

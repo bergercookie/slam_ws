@@ -14,20 +14,23 @@
 #include <isam/isam.h>
 #include <Eigen/LU>
 
-// using
-using namespace isam;
-using namespace Eigen;
 
-
+/**
+ * TODO - Include docstring..
+ */
 class MathUtils
 {
   public:
     MathUtils() {}
     ~MathUtils() {}
 
-    static double computeDistance(const geometry_msgs::Pose2DConstPtr &a, Node *b);
+    static double computeDistance(
+        const geometry_msgs::Pose2DConstPtr &a
+        , isam::Node *b);
 
   private:
+
+  protected:
 
 };
 
