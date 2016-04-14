@@ -36,11 +36,11 @@ class CallbackHandler
   public:
     CallbackHandler
       (
-        Slam *slamPtr
-      , std::vector<Node*> *node_l
-      , std::vector<sensor_msgs::LaserScan*> *laser_scans
-      , std::vector<geometry_msgs::Pose2D*> *g_pose2d_l
-      , std::vector<ros::Time*> *timestamps_l 
+        Slam *slam_ptr_in
+      , std::vector<Node*> *node_list_in
+      , std::vector<sensor_msgs::LaserScan*> *laser_scans_in
+      , std::vector<geometry_msgs::Pose2D*> *g_pose2d_list_in
+      , std::vector<ros::Time*> *timestamps_list_in
       );
 
     virtual ~CallbackHandler();
@@ -58,20 +58,17 @@ class CallbackHandler
     std::vector<ros::Time*> *timestamps_list;
 
   private:
-
     Noise noise_;
 
     sensor_msgs::LaserScan current_scan_;
-    double distance_;
-    double twist_;
-
-    double diff_x_, diff_y_, diff_th_;
-
     ros::Duration time_thresh_; // maximum time duration between successive nodes
     ros::Duration time_diff_; // maximum time duration between successive nodes
 
-    bool initialised_laser_scans_; // boolean to know if the laser_scans vector contains at least one element
+    double distance_;
+    double twist_;
+    double diff_x_, diff_y_, diff_th_;
 
+    bool initialised_laser_scans_; // boolean to know if the laser_scans vector contains at least one element
     
 };
 

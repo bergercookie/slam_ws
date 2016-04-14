@@ -19,17 +19,19 @@ using namespace Eigen;
  *****************************/
 
 CallbackHandler::CallbackHandler(
-    Slam *slamPtr, 
-    std::vector<Node*> *node_l, 
+    Slam *slam_ptr_in, 
+    std::vector<Node*> *node_list_in, 
     std::vector<sensor_msgs::LaserScan*> *laser_scans_in, // TODO change the in names to be consistent
-    std::vector<geometry_msgs::Pose2D*> *g_pose2d_l,
-    std::vector<ros::Time*> *timestamps_l/*, sensor_msgs::LaserScan cur_laser_s */):
-slam_ptr(slamPtr),
-node_list(node_l),
+    std::vector<geometry_msgs::Pose2D*> *g_pose2d_list_in,
+    std::vector<ros::Time*> *timestamps_list_in/*, sensor_msgs::LaserScan cur_laser_s */):
+
+slam_ptr(slam_ptr_in),
+node_list(node_list_in),
 laser_scans(laser_scans_in),
-g_pose2d_list(g_pose2d_l),
-timestamps_list(timestamps_l),
-noise_(Information(100. * eye(3))), // TODO change this...
+g_pose2d_list(g_pose2d_list_in),
+timestamps_list(timestamps_list_in),
+
+noise_(Information(100. * eye(3))), // TODO change its position...
 time_thresh_(ros::Duration(slam_params::kOdometryTimeThresh))
 { 
   //ROS_INFO("In the CalbackHander Constructor");
