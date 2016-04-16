@@ -26,7 +26,7 @@
 
 
 /** 
- * Class for handling callbacks in a uniform and structured way
+ * Class for handling callbacks in a uniform and structured manner
  * TODO - Include docstring
  */
 class CallbackHandler 
@@ -35,12 +35,44 @@ class CallbackHandler
     CallbackHandler(void);
     ~CallbackHandler();
 
+    /**
+     * CallbackHandler::checkOdometricConstraint
+     *
+     * Called when a new pose is available from the laser_scan_matcher. 
+     * If the distance or the degrees between the current estimated pose and the
+     * previous inserted node is greater than the corresponding fixed thresholds
+     * then add a new node to the graph.
+     */
     void checkOdometricConstraint(const geometry_msgs::Pose2DConstPtr& pose_in);
+
+    /**
+     * CallbackHandler::getCurLaserScan
+     *
+     * Fetch the newest laser scan from the corresponding topic and save it locally
+     * so it can be accessed from within the CallbackHandler
+     */
     void getCurLaserScan(const sensor_msgs::LaserScanPtr& laser_in);
-    void postGraphProperties(const ros::Publisher &graph_props_pub, const int robot_id) const;
+
+    /**
+     * CallbackHandler::initGraph
+     *
+     * initGraph initializes the Slam object and the corresponding
+     * nodes/time vectors
+     */
     void initGraph(void);
 
-    Slam *slam_ptr;
+    /** 
+     * CallbackHandler::postGraphProperties
+     *
+     * Factor for posting the current graph Properties to the corresponding /graphProps topic
+     * Function is designed to be as generic as possible, so only a reference to
+     * the ros::Publisher and a robot id is given
+     *
+     */
+    void postGraphProperties(const ros::Publisher &graph_props_pub, const int robot_id) const;
+
+    // TODO - talk about what should be private and what should be public
+    isam::Slam *slam_ptr;
 
     std::vector<isam::Node*> *node_list;
     std::vector<sensor_msgs::LaserScan*> *laser_scans;
@@ -60,7 +92,7 @@ class CallbackHandler
     double twist_;
 
     bool initialised_laser_scans_; // boolean to know if the laser_scans vector contains at least one element
-    
+
 };
 
 

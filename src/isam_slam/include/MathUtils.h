@@ -14,6 +14,9 @@
 #include <isam/isam.h>
 #include <Eigen/LU>
 
+// PROJECT
+#include <slam_params.h>
+
 
 /**
  * TODO - Include docstring..
@@ -24,9 +27,11 @@ class MathUtils
     MathUtils() {}
     ~MathUtils() {}
 
-    static double computeDistance(
+    static void computeDifference(
         const geometry_msgs::Pose2DConstPtr &a
-        , isam::Node *b);
+        , const isam::Node *b
+        , double* distance
+        , double* rot);
 
   private:
 
